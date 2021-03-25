@@ -1,64 +1,57 @@
-import { EuiBasicTable, EuiHealth, EuiLink, formatDate } from '@elastic/eui';
-import React from 'react';
+import {
+  EuiBasicTable,
+  EuiBasicTableColumn,
+  EuiCheckbox,
+  EuiHealth,
+  EuiLink,
+  formatDate,
+  htmlIdGenerator,
+} from '@elastic/eui';
+import React, { useEffect, useState } from 'react';
 
-export function BrandList(props: any) {
-  const columns = [
+export function BrandList({ brands, onEditBrand, onActiveChange }: any) {
+  const [items, setItems] = useState([]);
+
+  const actions = [
     {
-      field: 'firstName',
-      name: 'First Name',
-      sortable: true,
-      'data-test-subj': 'firstNameCell',
-      mobileOptions: {
-        render: (item: any) => (
-          <span>
-            {item.firstName}{' '}
-            <EuiLink href="#" target="_blank">
-              {item.lastName}
-            </EuiLink>
-          </span>
-        ),
-        header: false,
-        truncateText: false,
-        enlarge: true,
-        fullWidth: true,
-      },
-    },
-    {
-      field: 'lastName',
-      name: 'Last Name',
-      truncateText: true,
-      render: (name: any) => (
-        <EuiLink href="#" target="_blank">
-          {name}
-        </EuiLink>
-      ),
-      mobileOptions: {
-        show: false,
-      },
-    },
-    {
-      field: 'github',
-      name: 'Github',
-    },
-    {
-      field: 'dateOfBirth',
-      name: 'Date of Birth',
-      dataType: 'date',
-      render: (date: any) => formatDate(date, 'dobLong'),
-    },
-    {
-      field: 'online',
-      name: 'Online',
-      dataType: 'boolean',
-      render: (online: any) => {
-        const color = online ? 'success' : 'danger';
-        const label = online ? 'Online' : 'Offline';
-        return <EuiHealth color={color}>{label}</EuiHealth>;
-      },
+      icon: 'managementApp',
+      type: 'icon',
+      onClick: (brand: any) => onEditBrand(brand),
+      fullWidth: false,
     },
   ];
 
-  const items = props.brands.filter((brand: any, index: number) => index < 10);
+  const columns = [
+    {
+      field: 'name',
+      name: 'Tên',
+      sortable: true,
+    },
+    {
+      field: 'createdAt',
+      name: 'Ngày tạo',
+      align: 'center',
+    },
+    {
+      field: 'active',
+      name: 'Trạng thái',
+      dataType: 'boolean',
+      render: (active: boolean, item: any) => {
+        return (
+          <EuiCheckbox
+            id={item.id}
+            checked={item.active || false}
+            onChange={() => onActiveChange(item)}
+          />
+        );
+      },
+      align: 'center',
+    },
+    {
+      actions,
+      width: '10%',
+    },
+  ];
 
   const getRowProps = (item: any) => {
     const { id } = item;
@@ -79,6 +72,10 @@ export function BrandList(props: any) {
     };
   };
 
+  useEffect(() => {
+    setItems(brands.filter((brand: any, index: number) => index < 10));
+  }, [brands]);
+
   return (
     <EuiBasicTable
       items={items}
@@ -86,6 +83,7 @@ export function BrandList(props: any) {
       columns={columns}
       rowProps={getRowProps}
       cellProps={getCellProps}
+      hasActions={true}
     />
   );
 }

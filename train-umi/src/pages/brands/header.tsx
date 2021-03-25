@@ -12,7 +12,7 @@ export const Header = ({ title, actions }: any) => {
   return (
     <EuiPageHeader alignItems="stretch">
       <EuiFlexGroup direction="row" alignItems="center">
-        <EuiIcon type="canvasApp" size="l"></EuiIcon>
+        <EuiIcon type="logoElasticStack" size="l"></EuiIcon>
         <EuiFlexItem style={{ fontSize: 18 }}>{title}</EuiFlexItem>
       </EuiFlexGroup>
       <EuiPageHeaderSection>{actions}</EuiPageHeaderSection>

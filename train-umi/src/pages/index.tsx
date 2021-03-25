@@ -5,8 +5,11 @@ import {
   EuiPageSideBar,
   EuiFlexGroup,
   EuiIcon,
+  EuiListGroupItem,
+  EuiListGroup,
+  EuiButtonIcon,
 } from '@elastic/eui';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import SideMenu from './common/side-menu';
 import '@elastic/eui/dist/eui_theme_light.css';
 import Header from './common/header';
@@ -15,13 +18,6 @@ import Breadcrumb from './common/breadcrumb';
 export default function IndexPage(props: any) {
   console.log(props);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const menuItems = [{ icon: 'dashboardApp', title: 'Thương hiệu' }];
-  const sideNavItems = menuItems.map((item, index) => (
-    <div key={index} className="side-nav-item">
-      <EuiIcon type={item.icon} size="l" />
-    </div>
-  ));
-
   const appMenu = [
     {
       icon: 'canvasApp',
@@ -29,6 +25,10 @@ export default function IndexPage(props: any) {
       children: [{ title: 'Danh sách' }],
     },
   ];
+  const sideNavItems = appMenu.map((item, index) => (
+    <EuiButtonIcon key={index} iconType={item.icon} size="m" iconSize="l" />
+  ));
+
   return (
     <EuiFlexGroup
       className="guideFullScreenOverlay"
@@ -43,10 +43,10 @@ export default function IndexPage(props: any) {
       />
       <EuiPage style={{ marginTop: 49, padding: 0 }}>
         <EuiPageSideBar
-          style={{ minWidth: 50, backgroundColor: 'white', padding: 16 }}
+          style={{ minWidth: 60, backgroundColor: 'white' }}
           onMouseOver={() => setIsMenuOpen(true)}
         >
-          {sideNavItems}
+          <EuiListGroup bordered={false}>{sideNavItems}</EuiListGroup>
         </EuiPageSideBar>
         <EuiPageBody>{props.children}</EuiPageBody>
       </EuiPage>
