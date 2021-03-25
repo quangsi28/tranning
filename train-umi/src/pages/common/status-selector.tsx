@@ -7,31 +7,36 @@ import {
 } from '@elastic/eui';
 import React, { useState } from 'react';
 
+export const AppStatus = {
+  all: 'all',
+  active: 'active',
+  inactive: 'inactive',
+};
+
 const options = [
   {
-    value: 'warning',
+    value: AppStatus.all,
     inputDisplay: <EuiHealth color="subdued">Tất cả</EuiHealth>,
     'data-test-subj': 'option-warning',
-    disabled: true,
   },
   {
-    value: 'minor',
+    value: AppStatus.active,
     inputDisplay: <EuiHealth color="warning">Đang hoạt động</EuiHealth>,
     'data-test-subj': 'option-minor',
   },
   {
-    value: 'critical',
+    value: AppStatus.inactive,
     inputDisplay: <EuiHealth color="danger">Không hoạt động</EuiHealth>,
     'data-test-subj': 'option-critical',
   },
 ];
 
-export function StatusSelector({ onSelectStatus }: any) {
+export function StatusSelector({ onStatusChange }: any) {
   const [selectedValue, setSelectedValue] = useState(options[0].value);
   const onChange = (value: any) => {
     setSelectedValue(value);
-    if (onSelectStatus) {
-      onSelectStatus(value);
+    if (onStatusChange) {
+      onStatusChange(value);
     }
   };
   return (

@@ -33,10 +33,10 @@ export function BrandModal({ title, brand, onClose }: any) {
       </EuiModalBody>
 
       <EuiModalFooter>
-        <EuiButtonEmpty onClick={() => onClose()}>Cancel</EuiButtonEmpty>
+        <EuiButtonEmpty onClick={() => onClose()}>Trở về</EuiButtonEmpty>
 
-        <EuiButton onClick={() => onClose()} fill>
-          Save
+        <EuiButton onClick={() => onClose(name)} fill>
+          Lưu
         </EuiButton>
       </EuiModalFooter>
     </EuiModal>

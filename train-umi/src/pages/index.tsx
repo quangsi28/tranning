@@ -13,7 +13,6 @@ import React, { useState } from 'react';
 import SideMenu from './common/side-menu';
 import '@elastic/eui/dist/eui_theme_light.css';
 import Header from './common/header';
-import Breadcrumb from './common/breadcrumb';
 
 export default function IndexPage(props: any) {
   console.log(props);
@@ -31,9 +30,10 @@ export default function IndexPage(props: any) {
 
   return (
     <EuiFlexGroup
-      className="guideFullScreenOverlay"
+      className="app-container"
       gutterSize="none"
       direction="column"
+      style={{ height: '100%', overflow: 'hidden' }}
     >
       <Header />
       <SideMenu
@@ -41,10 +41,18 @@ export default function IndexPage(props: any) {
         isOpen={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}
       />
-      <EuiPage style={{ marginTop: 49, padding: 0 }}>
+      <EuiPage
+        style={{
+          marginTop: 49,
+          padding: 0,
+          height: '100%',
+        }}
+      >
         <EuiPageSideBar
+          className="main-side-bar"
           style={{ minWidth: 60, backgroundColor: 'white' }}
           onMouseOver={() => setIsMenuOpen(true)}
+          sticky
         >
           <EuiListGroup bordered={false}>{sideNavItems}</EuiListGroup>
         </EuiPageSideBar>

@@ -14,10 +14,12 @@ import {
 import React, { useState } from 'react';
 import { useEffect } from 'react';
 import { SearchBox } from '../common/search-box';
-import { StatusSelector } from '../common/status-selector';
+import { AppStatus, StatusSelector } from '../common/status-selector';
 import { BrandModal } from './brand-modal';
 import { BrandList } from './brand-list';
 import { Header } from './header';
+import { Brand } from './models/brand';
+import { v4 as uuidv4 } from 'uuid';
 
 const user = {
   id: '1',
@@ -32,8 +34,11 @@ const user = {
 // const brands = [user, user, user];
 
 export default function Brands() {
-  const [brands, setBrands] = useState([]);
-  const [editingBrand, setEditingBrand] = useState(null);
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [filteredBrands, setFilteredBrands] = useState<Brand[]>([]);
+  const [selectedStatus, setSelectedStatus] = useState<any>(AppStatus.all);
+  const [keyword, setKeyword] = useState<string>('');
+  const [editingBrand, setEditingBrand] = useState<Brand | any>(null);
   const [isAddBrandModalVisible, setIsAddBrandModalVisible] = useState(false);
   const [isEditBrandModalVisible, setIsEditBrandModalVisible] = useState(false);
 
@@ -43,16 +48,60 @@ export default function Brands() {
       .then(
         (result) => {
           setBrands(result.data);
+          setFilteredBrands(result.data);
           localStorage.setItem('brands', JSON.stringify(result.data));
         },
         (error) => {},
       );
   };
 
-  const handleAddBrandModalClosed = (event: any) => {
+  const filterBrands = () => {
+    if (!brands || brands.length === 0) {
+      setFilteredBrands(brands);
+    }
+    const filteredResult = brands.filter((brand) => {
+      let result;
+      if (keyword) {
+        result = brand.name?.includes(keyword);
+      }
+      if (selectedStatus === AppStatus.active) {
+        result = brand.active === true;
+      }
+      if (selectedStatus === AppStatus.inactive) {
+        result = brand.active === false;
+      }
+      return result;
+    });
+    console.log(filteredResult);
+
+    setFilteredBrands(filteredResult);
+  };
+
+  const handleAddBrandModalClosed = (brandName: any) => {
+    const formattedName = brandName?.trim();
+    if (!formattedName) {
+      setIsAddBrandModalVisible(false);
+      return;
+    }
+    const newBrand: Brand = {
+      id: uuidv4(),
+      name: brandName,
+      createdAt: new Date().toISOString(),
+      active: false,
+    };
+    brands.push(newBrand);
+    setBrands([...brands]);
     setIsAddBrandModalVisible(false);
   };
-  const handleEditBrandModalClosed = (event: any) => {
+  const handleEditBrandModalClosed = (brandName: any) => {
+    const formattedName = brandName?.trim();
+    if (!formattedName || !editingBrand) {
+      setIsEditBrandModalVisible(false);
+      setEditingBrand(null);
+      return;
+    }
+    editingBrand.name = brandName;
+    setBrands([...brands]);
     setIsEditBrandModalVisible(false);
     setEditingBrand(null);
   };
@@ -83,7 +132,12 @@ export default function Brands() {
 
   const handleActiveChanged = (brand: any) => {
     brand.active = !brand.active;
-    getBrandsData();
+    setBrands([...brands]);
+  };
+
+  const handleStatusChange = (status: any) => {
+    setSelectedStatus(status);
+    filterBrands();
   };
 
   useEffect(() => {
@@ -106,13 +160,13 @@ export default function Brands() {
       <EuiPage paddingSize="none">
         <EuiPageSideBar>
           <EuiForm>
-            <StatusSelector />
+            <StatusSelector onStatusChange={handleStatusChange} />
             <SearchBox />
           </EuiForm>
         </EuiPageSideBar>
         <EuiPageBody>
           <BrandList
-            brands={brands}
+            brands={filteredBrands}
             onEditBrand={handleUpdateBrandClick}
             onActiveChange={handleActiveChanged}
           />

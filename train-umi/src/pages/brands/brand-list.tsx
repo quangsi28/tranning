@@ -7,6 +7,7 @@ import {
   formatDate,
   htmlIdGenerator,
 } from '@elastic/eui';
+import { Action } from '@elastic/eui/src/components/basic_table/action_types';
 import React, { useEffect, useState } from 'react';
 
 export function BrandList({ brands, onEditBrand, onActiveChange }: any) {
@@ -14,14 +15,13 @@ export function BrandList({ brands, onEditBrand, onActiveChange }: any) {
 
   const actions = [
     {
-      icon: 'managementApp',
       type: 'icon',
+      icon: 'managementApp',
       onClick: (brand: any) => onEditBrand(brand),
-      fullWidth: false,
     },
   ];
 
-  const columns = [
+  const columns: Array<EuiBasicTableColumn<any>> = [
     {
       field: 'name',
       name: 'Tên',
@@ -31,6 +31,7 @@ export function BrandList({ brands, onEditBrand, onActiveChange }: any) {
       field: 'createdAt',
       name: 'Ngày tạo',
       align: 'center',
+      render: (createdAt: any) => formatDate(createdAt, 'DD/MM/YYYY, HH:mm'),
     },
     {
       field: 'active',
