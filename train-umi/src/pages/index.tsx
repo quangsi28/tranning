@@ -48,9 +48,7 @@ export default function IndexPage(props: any) {
         >
           {sideNavItems}
         </EuiPageSideBar>
-        <EuiPageBody>
-          <EuiPageContent>{props.children}</EuiPageContent>
-        </EuiPageBody>
+        <EuiPageBody>{props.children}</EuiPageBody>
       </EuiPage>
     </EuiFlexGroup>
   );
