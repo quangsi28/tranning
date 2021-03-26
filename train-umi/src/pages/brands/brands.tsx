@@ -20,18 +20,7 @@ import { BrandList } from './brand-list';
 import { Header } from './header';
 import { Brand } from './models/brand';
 import { v4 as uuidv4 } from 'uuid';
-
-const user = {
-  id: '1',
-  firstName: 'john',
-  lastName: 'doe',
-  github: 'johndoe',
-  dateOfBirth: Date.now(),
-  nationality: 'NL',
-  online: true,
-};
-
-// const brands = [user, user, user];
+import './brands.less';
 
 export default function Brands() {
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -45,14 +34,11 @@ export default function Brands() {
   const getBrandsData = () => {
     fetch(window.location.origin.toString() + '/api/brands', { method: 'GET' })
       .then((res) => res.json())
-      .then(
-        (result) => {
-          setBrands(result.data);
-          setFilteredBrands(result.data);
-          localStorage.setItem('brands', JSON.stringify(result.data));
-        },
-        (error) => {},
-      );
+      .then((result) => {
+        setBrands(result.data);
+        setFilteredBrands(result.data);
+        localStorage.setItem('brands', JSON.stringify(result.data));
+      }, console.error);
   };
 
   const filterBrands = (status?: any, keyword?: any) => {
@@ -152,9 +138,13 @@ export default function Brands() {
   }, []);
 
   return (
-    <EuiFlexGroup direction="column" gutterSize="none" style={{ padding: 16 }}>
+    <EuiFlexGroup
+      className="page-container"
+      direction="column"
+      gutterSize="none"
+    >
       <Header
-        title={`Thương hiệu (${brands.length})`}
+        title={`THƯƠNG HIỆU (${filteredBrands.length})`}
         actions={[
           <EuiButton
             key="add-brand"

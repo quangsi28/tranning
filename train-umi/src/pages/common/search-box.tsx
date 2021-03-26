@@ -1,12 +1,5 @@
-import {
-  EuiFieldSearch,
-  EuiFormControlLayout,
-  EuiFormLabel,
-  EuiFormRow,
-  EuiHealth,
-  EuiSuperSelect,
-} from '@elastic/eui';
-import React, { useState } from 'react';
+import { EuiFieldSearch, EuiFormRow } from '@elastic/eui';
+import { useState } from 'react';
 
 export function SearchBox({ onSearch }: any) {
   const [value, setValue] = useState('');

@@ -1,19 +1,9 @@
-import {
-  EuiHeader,
-  EuiHeaderLogo,
-  EuiHeaderLinks,
-  EuiHeaderLink,
-  EuiBadge,
-  EuiHeaderSectionItemButton,
-  EuiIcon,
-  EuiAvatar,
-  EuiSwitch,
-} from '@elastic/eui';
-import React from 'react';
+import { EuiHeader, EuiHeaderLogo, EuiSwitch } from '@elastic/eui';
 
 export default ({ selectedTheme, onThemeChange }: any) => {
   return (
     <EuiHeader
+      className="app-header"
       position="fixed"
       sections={[
         {
@@ -23,8 +13,8 @@ export default ({ selectedTheme, onThemeChange }: any) => {
         {
           items: [
             <EuiSwitch
-              label=""
-              checked={selectedTheme === 'dark' ? true : false}
+              label="Sáng/Tối"
+              checked={selectedTheme === 'dark'}
               onChange={(e) => onThemeChange(e)}
             />,
           ],

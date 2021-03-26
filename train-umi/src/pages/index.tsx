@@ -12,6 +12,9 @@ import {
 import React, { useEffect, useState } from 'react';
 import SideMenu from './common/side-menu';
 import Header from './common/header';
+import { Helmet } from '@/.umi/plugin-helmet/exports';
+import '@elastic/eui/dist/eui_theme_light.css';
+import './index.less';
 
 export default function IndexPage(props: any) {
   const defaultTheme = localStorage.getItem('theme') || 'light';
@@ -37,45 +40,57 @@ export default function IndexPage(props: any) {
       localStorage.setItem('theme', 'light');
       setTheme('light');
     }
+  };
+
+  const themeLinks = () => {
     if (localStorage.getItem('theme') === 'dark') {
-      require('@elastic/eui/dist/eui_theme_dark.css');
+      return (
+        <link
+          charSet="utf-8"
+          rel="stylesheet"
+          type="text/css"
+          href="https://cdn.jsdelivr.net/npm/@elastic/eui@31.3.0/dist/eui_theme_dark.css"
+        />
+      );
     } else {
-      require('@elastic/eui/dist/eui_theme_light.css');
+      return (
+        <link
+          charSet="utf-8"
+          rel="stylesheet"
+          type="text/css"
+          href="https://cdn.jsdelivr.net/npm/@elastic/eui@31.3.0/dist/eui_theme_light.css"
+        />
+      );
     }
   };
 
   useEffect(() => {});
 
   return (
-    <EuiFlexGroup
-      className="app-container"
-      gutterSize="none"
-      direction="column"
-      style={{ height: '100%', overflow: 'hidden' }}
-    >
-      <Header selectedTheme={theme} onThemeChange={handleThemeChanged} />
-      <SideMenu
-        menuList={appMenu}
-        isOpen={isMenuOpen}
-        onClose={() => setIsMenuOpen(false)}
-      />
-      <EuiPage
-        style={{
-          marginTop: 49,
-          padding: 0,
-          height: '100%',
-        }}
+    <>
+      <Helmet>{themeLinks()}</Helmet>
+      <EuiFlexGroup
+        className="app-container"
+        gutterSize="none"
+        direction="column"
       >
-        <EuiPageSideBar
-          className="main-side-bar"
-          style={{ minWidth: 60 }}
-          onMouseOver={() => setIsMenuOpen(true)}
-          sticky
-        >
-          <EuiListGroup bordered={false}>{sideNavItems}</EuiListGroup>
-        </EuiPageSideBar>
-        <EuiPageBody>{props.children}</EuiPageBody>
-      </EuiPage>
-    </EuiFlexGroup>
+        <Header selectedTheme={theme} onThemeChange={handleThemeChanged} />
+        <SideMenu
+          menuList={appMenu}
+          isOpen={isMenuOpen}
+          onClose={() => setIsMenuOpen(false)}
+        />
+        <EuiPage className="app-main">
+          <EuiPageSideBar
+            className="side-container"
+            onMouseOver={() => setIsMenuOpen(true)}
+            sticky
+          >
+            <EuiListGroup>{sideNavItems}</EuiListGroup>
+          </EuiPageSideBar>
+          <EuiPageBody>{props.children}</EuiPageBody>
+        </EuiPage>
+      </EuiFlexGroup>
+    </>
   );
 }
