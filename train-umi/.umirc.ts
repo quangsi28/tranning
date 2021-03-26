@@ -13,9 +13,8 @@ export default defineConfig({
         {
           path: '/brands',
           component: '@/pages/brands/brands',
-          title: 'Thương hiệu',
         },
-        { path: '/other', component: '@/pages/brands/brands', title: 'Khác' },
+        { path: '/other', component: '@/pages/brands/brands' },
       ],
     },
   ],

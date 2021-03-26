@@ -37,7 +37,7 @@ export default function Brands() {
   const [brands, setBrands] = useState<Brand[]>([]);
   const [filteredBrands, setFilteredBrands] = useState<Brand[]>([]);
   const [selectedStatus, setSelectedStatus] = useState<any>(AppStatus.all);
-  const [keyword, setKeyword] = useState<string>('');
+  const [searchKeyword, setSearchKeyword] = useState<string>('');
   const [editingBrand, setEditingBrand] = useState<Brand | any>(null);
   const [isAddBrandModalVisible, setIsAddBrandModalVisible] = useState(false);
   const [isEditBrandModalVisible, setIsEditBrandModalVisible] = useState(false);
@@ -55,25 +55,24 @@ export default function Brands() {
       );
   };
 
-  const filterBrands = () => {
-    if (!brands || brands.length === 0) {
-      setFilteredBrands(brands);
-    }
+  const filterBrands = (status?: any, keyword?: any) => {
     const filteredResult = brands.filter((brand) => {
-      let result;
+      let filterResult;
+      let searchResult;
+      if (status === AppStatus.active) {
+        filterResult = brand.active === true;
+      } else if (status === AppStatus.inactive) {
+        filterResult = brand.active === false;
+      } else {
+        filterResult = true;
+      }
       if (keyword) {
-        result = brand.name?.includes(keyword);
+        searchResult = brand.name?.includes(keyword);
+      } else {
+        searchResult = true;
       }
-      if (selectedStatus === AppStatus.active) {
-        result = brand.active === true;
-      }
-      if (selectedStatus === AppStatus.inactive) {
-        result = brand.active === false;
-      }
-      return result;
+      return filterResult && searchResult;
     });
-    console.log(filteredResult);
-
     setFilteredBrands(filteredResult);
   };
 
@@ -90,6 +89,7 @@ export default function Brands() {
       active: false,
     };
     brands.push(newBrand);
+    filterBrands(selectedStatus, searchKeyword);
     setBrands([...brands]);
     setIsAddBrandModalVisible(false);
   };
@@ -102,6 +102,7 @@ export default function Brands() {
     }
     editingBrand.name = brandName;
     setBrands([...brands]);
+    filterBrands(selectedStatus, searchKeyword);
     setIsEditBrandModalVisible(false);
     setEditingBrand(null);
   };
@@ -133,11 +134,17 @@ export default function Brands() {
   const handleActiveChanged = (brand: any) => {
     brand.active = !brand.active;
     setBrands([...brands]);
+    filterBrands(selectedStatus, searchKeyword);
   };
 
-  const handleStatusChange = (status: any) => {
+  const handleStatusChanged = (status: any) => {
     setSelectedStatus(status);
-    filterBrands();
+    filterBrands(status, searchKeyword);
+  };
+
+  const handleSearchBrandChanged = (keyword: string) => {
+    setSearchKeyword(keyword);
+    filterBrands(selectedStatus, keyword);
   };
 
   useEffect(() => {
@@ -147,7 +154,7 @@ export default function Brands() {
   return (
     <EuiFlexGroup direction="column" gutterSize="none" style={{ padding: 16 }}>
       <Header
-        title="Thương hiệu"
+        title={`Thương hiệu (${brands.length})`}
         actions={[
           <EuiButton
             key="add-brand"
@@ -160,8 +167,8 @@ export default function Brands() {
       <EuiPage paddingSize="none">
         <EuiPageSideBar>
           <EuiForm>
-            <StatusSelector onStatusChange={handleStatusChange} />
-            <SearchBox />
+            <StatusSelector onStatusChange={handleStatusChanged} />
+            <SearchBox onSearch={handleSearchBrandChanged} />
           </EuiForm>
         </EuiPageSideBar>
         <EuiPageBody>

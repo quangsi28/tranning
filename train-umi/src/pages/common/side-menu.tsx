@@ -6,23 +6,23 @@ import {
   EuiText,
   EuiTitle,
 } from '@elastic/eui';
+import { EuiFlexGroup } from '@elastic/eui/src/components/flex/flex_group';
 import React, { useEffect, useState } from 'react';
 import SideMenuItem from './side-menu-item';
 
-export default (props: any) => {
-  const [navIsOpen, setNavIsOpen] = useState(props.isOpen);
-  const [navIsDocked, setNavIsDocked] = useState(false);
+export default ({ menuList, isOpen, onClose }: any) => {
+  const [navIsOpen, setNavIsOpen] = useState(isOpen);
 
   useEffect(() => {
-    setNavIsOpen(props.isOpen);
+    setNavIsOpen(isOpen);
   });
 
   const navItems = () => {
-    if (!props.menuList || props.menuList.length === 0) {
+    if (!menuList || menuList.length === 0) {
       return null;
     }
-    return props.menuList.map((menuItem: any, index: number) => {
-      return <SideMenuItem key={index} theme={props.theme} menu={menuItem} />;
+    return menuList.map((menuItem: any, index: number) => {
+      return <SideMenuItem key={index} menu={menuItem} />;
     });
   };
 
@@ -30,7 +30,7 @@ export default (props: any) => {
     <EuiCollapsibleNav
       isOpen={navIsOpen}
       isDocked={false}
-      onClose={props.onClose}
+      onClose={onClose}
       showCloseButton={false}
       style={{ top: 49 }}
     >

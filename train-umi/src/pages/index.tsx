@@ -9,14 +9,15 @@ import {
   EuiListGroup,
   EuiButtonIcon,
 } from '@elastic/eui';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import SideMenu from './common/side-menu';
-import '@elastic/eui/dist/eui_theme_light.css';
 import Header from './common/header';
 
 export default function IndexPage(props: any) {
-  console.log(props);
+  const defaultTheme = localStorage.getItem('theme') || 'light';
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [theme, setTheme] = useState(defaultTheme);
+
   const appMenu = [
     {
       icon: 'canvasApp',
@@ -28,6 +29,23 @@ export default function IndexPage(props: any) {
     <EuiButtonIcon key={index} iconType={item.icon} size="m" iconSize="l" />
   ));
 
+  const handleThemeChanged = (event: any) => {
+    if (event.target.checked) {
+      localStorage.setItem('theme', 'dark');
+      setTheme('dark');
+    } else {
+      localStorage.setItem('theme', 'light');
+      setTheme('light');
+    }
+    if (localStorage.getItem('theme') === 'dark') {
+      require('@elastic/eui/dist/eui_theme_dark.css');
+    } else {
+      require('@elastic/eui/dist/eui_theme_light.css');
+    }
+  };
+
+  useEffect(() => {});
+
   return (
     <EuiFlexGroup
       className="app-container"
@@ -35,7 +53,7 @@ export default function IndexPage(props: any) {
       direction="column"
       style={{ height: '100%', overflow: 'hidden' }}
     >
-      <Header />
+      <Header selectedTheme={theme} onThemeChange={handleThemeChanged} />
       <SideMenu
         menuList={appMenu}
         isOpen={isMenuOpen}
@@ -50,7 +68,7 @@ export default function IndexPage(props: any) {
       >
         <EuiPageSideBar
           className="main-side-bar"
-          style={{ minWidth: 60, backgroundColor: 'white' }}
+          style={{ minWidth: 60 }}
           onMouseOver={() => setIsMenuOpen(true)}
           sticky
         >

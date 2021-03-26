@@ -1,7 +1,7 @@
 import { EuiSideNav } from '@elastic/eui';
 import React, { useState } from 'react';
 
-export default function SideNav(props: any) {
+export default function SideNav() {
   const [isSideNavOpenOnMobile, setisSideNavOpenOnMobile] = useState(false);
 
   const toggleOpenOnMobile = () => {

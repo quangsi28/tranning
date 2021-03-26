@@ -15,7 +15,9 @@ export const Header = ({ title, actions }: any) => {
       <EuiFlexGroup direction="row" alignItems="center" gutterSize="m">
         <EuiIcon type="logoElasticStack" size="l" />
         <EuiFlexItem>
-          <h1>{title}</h1>
+          <EuiTitle size="xxs" textTransform="uppercase">
+            <h3>{title}</h3>
+          </EuiTitle>
         </EuiFlexItem>
       </EuiFlexGroup>
       <EuiPageHeaderSection>{actions}</EuiPageHeaderSection>
