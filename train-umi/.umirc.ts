@@ -14,7 +14,6 @@ export default defineConfig({
           path: '/brands',
           component: '@/pages/brands/brands',
         },
-        { path: '/other', component: '@/pages/brands/brands' },
       ],
     },
   ],
