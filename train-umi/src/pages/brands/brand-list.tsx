@@ -1,16 +1,19 @@
 import {
-  EuiBasicTable,
   EuiBasicTableColumn,
-  EuiCheckbox,
-  EuiHealth,
-  EuiLink,
   formatDate,
+  EuiCheckbox,
   htmlIdGenerator,
+  EuiBasicTable,
 } from '@elastic/eui';
-import { Action } from '@elastic/eui/src/components/basic_table/action_types';
 import React, { useEffect, useState } from 'react';
 
-export function BrandList({ brands, onEditBrand, onActiveChange }: any) {
+export function BrandList({
+  brands,
+  onEditBrand,
+  onActiveChange,
+  onTableChange,
+  pagination,
+}: any) {
   const [items, setItems] = useState([]);
 
   const actions = [
@@ -37,11 +40,11 @@ export function BrandList({ brands, onEditBrand, onActiveChange }: any) {
       field: 'active',
       name: 'Trạng thái',
       dataType: 'boolean',
-      render: (active: boolean, item: any) => {
+      render: (active: any, item: any) => {
         return (
           <EuiCheckbox
-            id={item.id}
-            checked={item.active || false}
+            id={htmlIdGenerator()()}
+            checked={active}
             onChange={() => onActiveChange(item)}
           />
         );
@@ -54,37 +57,27 @@ export function BrandList({ brands, onEditBrand, onActiveChange }: any) {
     },
   ];
 
-  const getRowProps = (item: any) => {
-    const { id } = item;
-    return {
-      'data-test-subj': `row-${id}`,
-      className: 'customRowClass',
-      onClick: () => {},
-    };
+  const _pagination = {
+    pageIndex: pagination.pageIndex,
+    pageSize: pagination.pageSize,
+    totalItemCount: pagination.totalItemCount,
+    pageSizeOptions: [10, 15, 20],
+    hidePerPageOptions: false,
   };
 
-  const getCellProps = (item: any, column: any) => {
-    const { id } = item;
-    const { field } = column;
-    return {
-      className: 'customCellClass',
-      'data-test-subj': `cell-${id}-${field}`,
-      textOnly: true,
-    };
-  };
+  console.log(_pagination);
 
   useEffect(() => {
-    setItems(brands.filter((brand: any, index: number) => index < 10));
+    setItems(brands);
   }, [brands]);
 
   return (
     <EuiBasicTable
       items={items}
-      rowHeader="firstName"
       columns={columns}
-      rowProps={getRowProps}
-      cellProps={getCellProps}
       hasActions={true}
+      pagination={_pagination}
+      onChange={(e) => onTableChange(e)}
     />
   );
 }

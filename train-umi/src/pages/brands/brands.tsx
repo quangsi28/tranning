@@ -1,66 +1,42 @@
 import {
   EuiButton,
-  EuiFieldSearch,
-  EuiFieldText,
   EuiFlexGroup,
   EuiForm,
-  EuiFormControlLayout,
-  EuiFormLabel,
   EuiPage,
   EuiPageBody,
   EuiPageSideBar,
-  EuiSpacer,
 } from '@elastic/eui';
-import React, { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useEffect } from 'react';
 import { SearchBox } from '../common/search-box';
-import { AppStatus, StatusSelector } from '../common/status-selector';
+import { APP_STATUS, StatusSelector } from '../common/status-selector';
 import { BrandModal } from './brand-modal';
 import { BrandList } from './brand-list';
 import { Header } from './header';
 import { Brand } from './models/brand';
-import { v4 as uuidv4 } from 'uuid';
 import './brands.less';
+import ToastContext, { ToastContextProvider } from '../contexts/toast-context';
+import {
+  getBrandList,
+  requestCreateBrand,
+  requestUpdateBrand,
+  updateBrandStatus,
+} from '../services/brand-service';
 
 export default function Brands() {
   const [brands, setBrands] = useState<Brand[]>([]);
-  const [filteredBrands, setFilteredBrands] = useState<Brand[]>([]);
-  const [selectedStatus, setSelectedStatus] = useState<any>(AppStatus.all);
+  const [selectedStatus, setSelectedStatus] = useState<any>(APP_STATUS.all);
   const [searchKeyword, setSearchKeyword] = useState<string>('');
   const [editingBrand, setEditingBrand] = useState<Brand | any>(null);
   const [isAddBrandModalVisible, setIsAddBrandModalVisible] = useState(false);
   const [isEditBrandModalVisible, setIsEditBrandModalVisible] = useState(false);
+  const [pagination, setPagination] = useState<any>({
+    pageIndex: 0,
+    pageSize: 10,
+    totalItemCount: 0,
+  });
 
-  const getBrandsData = () => {
-    fetch(window.location.origin.toString() + '/api/brands', { method: 'GET' })
-      .then((res) => res.json())
-      .then((result) => {
-        setBrands(result.data);
-        setFilteredBrands(result.data);
-        localStorage.setItem('brands', JSON.stringify(result.data));
-      }, console.error);
-  };
-
-  const filterBrands = (status?: any, keyword?: any) => {
-    const filteredResult = brands.filter((brand) => {
-      let filterResult;
-      let searchResult;
-      if (status === AppStatus.active) {
-        filterResult = brand.active === true;
-      } else if (status === AppStatus.inactive) {
-        filterResult = brand.active === false;
-      } else {
-        filterResult = true;
-      }
-      if (keyword) {
-        searchResult = brand.name?.includes(keyword);
-      } else {
-        searchResult = true;
-      }
-      return filterResult && searchResult;
-    });
-    setFilteredBrands(filteredResult);
-  };
+  const addToast = useContext(ToastContext);
 
   const handleAddBrandModalClosed = (brandName: any) => {
     const formattedName = brandName?.trim();
@@ -68,17 +44,10 @@ export default function Brands() {
       setIsAddBrandModalVisible(false);
       return;
     }
-    const newBrand: Brand = {
-      id: uuidv4(),
-      name: brandName,
-      createdAt: new Date().toISOString(),
-      active: false,
-    };
-    brands.push(newBrand);
-    filterBrands(selectedStatus, searchKeyword);
-    setBrands([...brands]);
+    createBrand(brandName);
     setIsAddBrandModalVisible(false);
   };
+
   const handleEditBrandModalClosed = (brandName: any) => {
     const formattedName = brandName?.trim();
     if (!formattedName || !editingBrand) {
@@ -86,9 +55,7 @@ export default function Brands() {
       setEditingBrand(null);
       return;
     }
-    editingBrand.name = brandName;
-    setBrands([...brands]);
-    filterBrands(selectedStatus, searchKeyword);
+    updateBrandName(brandName);
     setIsEditBrandModalVisible(false);
     setEditingBrand(null);
   };
@@ -118,58 +85,126 @@ export default function Brands() {
   };
 
   const handleActiveChanged = (brand: any) => {
-    brand.active = !brand.active;
-    setBrands([...brands]);
-    filterBrands(selectedStatus, searchKeyword);
+    changeBrandStatus(brand._id);
   };
 
   const handleStatusChanged = (status: any) => {
     setSelectedStatus(status);
-    filterBrands(status, searchKeyword);
   };
 
   const handleSearchBrandChanged = (keyword: string) => {
     setSearchKeyword(keyword);
-    filterBrands(selectedStatus, keyword);
+  };
+
+  const handlePageChanged = (e: any) => {
+    setPagination({
+      pageIndex: e.page.index,
+      pageSize: e.page.size,
+      totalItemCount: pagination.totalItemCount,
+    });
   };
 
   useEffect(() => {
     getBrandsData();
-  }, []);
+  }, [
+    selectedStatus,
+    searchKeyword,
+    pagination.pageIndex,
+    ,
+    pagination.pageSize,
+  ]);
+
+  function getBrandsData() {
+    getBrandList(
+      pagination.pageSize,
+      pagination.pageIndex,
+      getRequestStatus(),
+      searchKeyword,
+    ).then((result: any) => {
+      const responseData = result.data.data;
+      console.log(responseData.data);
+      setBrands(responseData.data);
+      const _pagination = {
+        pageIndex: pagination.pageIndex,
+        pageSize: responseData.limitPerPage,
+        totalItemCount: responseData.total,
+      };
+      setPagination(_pagination);
+    }, console.error);
+  }
+
+  function createBrand(name: string) {
+    requestCreateBrand(name).then((response: any) => {
+      getBrandsData();
+    });
+  }
+
+  function updateBrandName(brandName: string) {
+    const updateBrand: Brand = {
+      _id: editingBrand._id,
+      name: brandName,
+    };
+    requestUpdateBrand(updateBrand).then((response: any) => {
+      getBrandsData();
+    });
+  }
+
+  function changeBrandStatus(brandId: string) {
+    updateBrandStatus(brandId).then((response: any) => {
+      console.log(response);
+      addToast('success');
+      getBrandsData();
+    });
+  }
+
+  function getRequestStatus() {
+    switch (selectedStatus) {
+      case APP_STATUS.active:
+        return [true];
+      case APP_STATUS.inactive:
+        return [false];
+      case APP_STATUS.all:
+        return [true, false];
+    }
+  }
 
   return (
-    <EuiFlexGroup
-      className="page-container"
-      direction="column"
-      gutterSize="none"
-    >
-      <Header
-        title={`THƯƠNG HIỆU (${filteredBrands.length})`}
-        actions={[
-          <EuiButton
-            key="add-brand"
-            onClick={() => setIsAddBrandModalVisible(true)}
-          >
-            + Tạo mới
-          </EuiButton>,
-        ]}
-      />
-      <EuiPage paddingSize="none">
-        <EuiPageSideBar>
-          <EuiForm>
-            <StatusSelector onStatusChange={handleStatusChanged} />
-            <SearchBox onSearch={handleSearchBrandChanged} />
-          </EuiForm>
-        </EuiPageSideBar>
-        <EuiPageBody>
-          <BrandList
-            brands={filteredBrands}
-            onEditBrand={handleUpdateBrandClick}
-            onActiveChange={handleActiveChanged}
-          />
-        </EuiPageBody>
-      </EuiPage>
-      {addBrandModal}
-    </EuiFlexGroup>
+    <ToastContextProvider>
+      <EuiFlexGroup
+        className="page-container"
+        direction="column"
+        gutterSize="none"
+      >
+        <Header
+          title={`THƯƠNG HIỆU (${brands.length})`}
+          actions={[
+            <EuiButton
+              key="add-brand"
+              onClick={() => setIsAddBrandModalVisible(true)}
+            >
+              + Tạo mới
+            </EuiButton>,
+          ]}
+        />
+        <EuiPage paddingSize="none">
+          <EuiPageSideBar>
+            <EuiForm>
+              <StatusSelector onStatusChange={handleStatusChanged} />
+              <SearchBox onSearch={handleSearchBrandChanged} />
+            </EuiForm>
+          </EuiPageSideBar>
+          <EuiPageBody>
+            <BrandList
+              brands={brands}
+              onEditBrand={handleUpdateBrandClick}
+              onActiveChange={handleActiveChanged}
+              onTableChange={handlePageChanged}
+              pagination={pagination}
+            />
+          </EuiPageBody>
+        </EuiPage>
+        {addBrandModal}
+      </EuiFlexGroup>
+    </ToastContextProvider>
   );
 }

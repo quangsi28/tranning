@@ -7,7 +7,7 @@ import {
 } from '@elastic/eui';
 import React, { useState } from 'react';
 
-export const AppStatus = {
+export const APP_STATUS = {
   all: 'all',
   active: 'active',
   inactive: 'inactive',
@@ -15,17 +15,17 @@ export const AppStatus = {
 
 const options = [
   {
-    value: AppStatus.all,
+    value: APP_STATUS.all,
     inputDisplay: <EuiHealth color="subdued">Tất cả</EuiHealth>,
     'data-test-subj': 'option-warning',
   },
   {
-    value: AppStatus.active,
+    value: APP_STATUS.active,
     inputDisplay: <EuiHealth color="warning">Đang hoạt động</EuiHealth>,
     'data-test-subj': 'option-minor',
   },
   {
-    value: AppStatus.inactive,
+    value: APP_STATUS.inactive,
     inputDisplay: <EuiHealth color="danger">Không hoạt động</EuiHealth>,
     'data-test-subj': 'option-critical',
   },

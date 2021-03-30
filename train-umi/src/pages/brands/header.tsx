@@ -12,15 +12,16 @@ import React from 'react';
 
 export const Header = ({ title, actions }: any) => {
   return (
-    <EuiPageHeader alignItems="stretch">
-      <EuiFlexGroup direction="row" alignItems="center" gutterSize="m">
-        <EuiIcon type="logoElasticStack" size="m" />
-        <EuiFlexItem>
-          <EuiText size="s">
+    <EuiPageHeader alignItems="center">
+      <EuiPageHeaderSection>
+        <EuiFlexGroup direction="row" alignItems="center" gutterSize="m">
+          <EuiIcon type="logoElasticStack" size="m" />
+          <EuiFlexItem>
             <h4>{title}</h4>
-          </EuiText>
-        </EuiFlexItem>
-      </EuiFlexGroup>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      </EuiPageHeaderSection>
+
       <EuiPageHeaderSection>{actions}</EuiPageHeaderSection>
     </EuiPageHeader>
   );

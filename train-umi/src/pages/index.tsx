@@ -15,6 +15,7 @@ import Header from './common/header';
 import { Helmet } from '@/.umi/plugin-helmet/exports';
 import '@elastic/eui/dist/eui_theme_light.css';
 import './index.less';
+import { ToastContextProvider } from './contexts/toast-context';
 
 export default function IndexPage(props: any) {
   const defaultTheme = localStorage.getItem('theme') || 'light';
